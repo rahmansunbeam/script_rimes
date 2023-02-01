@@ -25,6 +25,6 @@ for t in tables:
     t = t.replace('-', '_')
     t = t.replace('Bangladesh_southasia', '')
     t = t.replace('_districts.csv', '')
-    # arcpy.management.CopyFeatures(joined_fc, output_fc + '\BD_District' + t)
-    arcpy.management.CopyFeatures(joined_fc, output_shp + '\BD_District' + t)
+    arcpy.management.CopyFeatures(joined_fc, output_fc + '\BD_District' + t)
+    # arcpy.management.CopyFeatures(joined_fc, output_shp + '\BD_District' + t)
     arcpy.management.RemoveJoin(joined_fc)

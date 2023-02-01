@@ -7,28 +7,26 @@ __email__  = 'sunbeam.rahman@live.com'
 
 ## -------------------------------- ## 
 
-import os
+import pathlib
 import xarray as xr
-import pandas as pd
-from glob import glob
 
-input_dir = r"D:\Documents\RIMES\NETCDF\CanESM5"
-output_dir = r"D:\Documents\RIMES\NETCDF\CanESM5\output"
+input_dir = pathlib.Path(r"D:\Documents\RIMES\NETCDF\IITM-ESM")
 
-for files in glob(input_dir + "/**/*.nc", recursive=True):
-
-    file_name = os.path.basename(files)
-    file_path = os.path.abspath(files)
-    out_file = output_dir + "\\" + file_name[:-3] + ".csv"
+for file in input_dir.glob("**\*.nc"):
     
-    if os.path.isfile(file_path):
+    # check if the folder exists, create if not
+    output_dir = input_dir / "output"
+    output_dir.mkdir(parents=True, exist_ok=True)
 
-        if not file_name.endswith("csv") and not os.path.isfile(out_file):
+    out_file = output_dir / (file.stem + ".csv")
+    
+    if file.exists():
 
-            print("processing: " + file_path)
+        if not out_file.exists():
 
-            ds = xr.open_dataset(file_path)
-            # ds.to_dataframe().to_csv(out_file)
+            print("processing: {}".format(file))
+
+            ds = xr.open_dataset(file)
 
             # convert to pandas dataframe
             df = ds.to_dataframe()
