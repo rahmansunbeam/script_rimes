@@ -10,7 +10,7 @@ __email__  = 'sunbeam.rahman@live.com'
 import pathlib
 import xarray as xr
 
-input_dir = pathlib.Path(r"D:\Documents\RIMES\NETCDF\IITM-ESM")
+input_dir = pathlib.Path(r"D:\Documents\RIMES\NETCDF\MPI-ESM1-2-HR")
 
 for file in input_dir.glob("**\*.nc"):
     
