@@ -9,8 +9,9 @@ __email__  = 'sunbeam.rahman@live.com'
 
 import pathlib
 import xarray as xr
+import numpy as np
 
-input_dir = pathlib.Path(r"D:\Documents\RIMES\NETCDF\MPI-ESM1-2-HR")
+input_dir = pathlib.Path(r"D:\Documents\RIMES\NETCDF\MRI-ESM2-0")
 
 for file in input_dir.glob("**\*.nc"):
     
@@ -40,9 +41,16 @@ for file in input_dir.glob("**\*.nc"):
 
             # check avg tasmin for each month for each station
             # df_1 = df.groupby([df['time'].dt.year, df['time'].dt.month, 'station_name'])['tasmin'].mean()
-            df_1 = df.groupby([df['time'].dt.year, 'station_name'])[df_col].mean()
+
+            # yearly average
+            # df_1 = df.groupby([df['time'].dt.year, 'station_name'])[df_col].mean()
+
+            # 30 year average
+            df_1 = df.groupby([np.floor(df['time'].dt.year/30)*30, 'station_name'])[df_col].mean()
+
             # convert series to dataframe
-            df_1 = df_1.to_frame().reset_index()
+            # df_1 = df_1.to_frame().reset_index()
+            df_1 = df_1.reset_index()
 
             # pivot dataframe
             df_2 = df_1.pivot('station_name', 'time').stack(0).rename_axis(['station_name', 'value'])

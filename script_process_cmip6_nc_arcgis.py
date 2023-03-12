@@ -17,6 +17,7 @@ tables = [i.name for i in map.listTables()]
 
 output_fc = r"E:\GIS_Files\GIS_DATA.gdb\climate_cmip6_CanESM5"
 output_shp = r"E:\GIS_Files\GIS_Projects\clim_CMIP6"
+output_gjson = r"D:\Documents"
 
 arcpy.env.qualifiedFieldNames = False
 
