@@ -16,8 +16,13 @@ arcpy.env.workspace = "E:\GIS_Files"
 arcpy.env.overwriteOutput = True
 
 # output_fishnet = r"E:\GIS_Files\BD_Fishnet.shp"
-output_fishnet = r"E:\GIS_Files\BD_Fishnet_Buffelo.shp"
+output_fishnet = r"E:\GIS_Files\BD_GLEAM3_Emission_bfl_milk.shp"
 backup_csv = r"D:\Workspace\script_rimes\backup.csv"
+
+# Construct the API URL for this cell
+dim_a_species_param = 'BFL' #CTL, GTS, BFL, CHK, PGS, SHP, ALL
+dim_comm_param = 'MILK_PR' #EGGS_PR, MEAT_PR, MILK_PR
+
 count = 0
 emissions_dict = {}
 
@@ -36,10 +41,6 @@ with arcpy.da.SearchCursor(output_fishnet, ["OID@", "SHAPE@"]) as search_cur:
 
         # Get the extent of the cell
         xmax, ymax, xmin, ymin = round(extent_dd.XMax, 3), round(extent_dd.YMax, 3), round(extent_dd.XMin, 3), round(extent_dd.YMin, 3)
-
-        # Construct the API URL for this cell
-        dim_a_species_param = 'BFL' #CTL, GTS, BFL, CHK, PGS, SHP, ALL_LU
-        dim_comm_param = 'TOTL_PR' #EGGS_PR, MEAT_PR, MILK_PR
 
         # GLEAM3
         url = f"https://io.apps.fao.org/gismgr/api/v1/GLEAM3/EMS/2/wms?request=GetFeatureInfo&tiled=true&query_layers=EMS&dim_src=ALL&bbox={xmin},{ymin},{xmax},{ymax}&format=image/png&dim_gas=CO2EQ&version=1.1.1&transparent=true&exceptions=application/vnd.ogc.se_xml&dim_comm={dim_comm_param}&dim_a_species={dim_a_species_param}&srs=EPSG:4326&service=WMS&layers=EMS&width=256&x=1&feature_count=101&y=195&styles=&info_format=application/json&height=256"
@@ -62,7 +63,7 @@ with arcpy.da.SearchCursor(output_fishnet, ["OID@", "SHAPE@"]) as search_cur:
             emissions_dict[search_row[0]] = [param, emissions]
             # break
 
-with open(backup_csv, "w", newline="") as csv_file:
+with open(r"D:\Workspace\script_rimes\backup_{}_{}.csv".format(dim_a_species_param, dim_comm_param), "w", newline="") as csv_file:
     writer = csv.writer(csv_file)
     # write header row
     writer.writerow(["OID", "param", "emissions"])
@@ -81,7 +82,8 @@ with arcpy.da.UpdateCursor(output_fishnet, ["OID@", "param", "emissions"]) as up
 
                 if update_row[0] == key:
 
-                    update_row[1] = values[0]
+                    # update_row[1] = values[0]
+                    update_row[1] = dim_a_species_param
                     update_row[2] = values[1]
                     update_cur.updateRow(update_row)
                     count += 1
