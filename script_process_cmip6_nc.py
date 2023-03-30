@@ -11,7 +11,7 @@ import pathlib
 import xarray as xr
 import numpy as np
 
-input_dir = pathlib.Path(r"D:\DOCUMENTS\RIMES\NetCDF_Indices\ACCESS-CM2")
+input_dir = pathlib.Path(r"D:\Data\ACCESS-CM2\ssp585\r1i1p1f1\tas\month")
 
 for file in input_dir.glob("**\*.nc"):
     
@@ -33,8 +33,8 @@ for file in input_dir.glob("**\*.nc"):
             df = ds.to_dataframe()
             df = df.reset_index()
 
-            # df_col = [col for col in df.columns if col not in ['time', 'station', 'station_name']][0]
-            df_col = [col for col in df.columns if col not in ['time', 'bnds', 'station', 'time_bnds', 'station_name']][0]
+            df_col = [col for col in df.columns if col not in ['time', 'station', 'station_name']][0]
+            # df_col = [col for col in df.columns if col not in ['time', 'bnds', 'station', 'time_bnds', 'station_name']][0]
 
             # check if there is null values
             # print(df.isnull().sum())
