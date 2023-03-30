@@ -70,7 +70,7 @@ with arcpy.da.SearchCursor(output_fishnet, ["OID@", "SHAPE@"]) as search_cur:
 with open(r"D:\Workspace\script_rimes\backup_density_{}_{}.csv".format(dim_a_species_param, dim_comm_param), "w", newline="") as csv_file:
     writer = csv.writer(csv_file)
     # write header row
-    writer.writerow(["OID", "param", "density"])
+    writer.writerow(["OID", "density"])
     # write data rows
     for oid, values in emissions_dict.items():
         row = [oid] + values
