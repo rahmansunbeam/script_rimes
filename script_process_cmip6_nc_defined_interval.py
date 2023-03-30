@@ -19,14 +19,19 @@ intervals = [(pd.Timestamp('2021-01-01'), pd.Timestamp('2050-12-31')),
              (pd.Timestamp('2061-01-01'), pd.Timestamp('2090-12-31')),
              (pd.Timestamp('2071-01-01'), pd.Timestamp('2100-12-31'))]
 
-input_dir = pathlib.Path(r"D:\DOCUMENTS\RIMES\NETCDF_CMIP6_sublevels\ACCESS-CM2\ssp585\r1i1p1f1")
+input_dir = pathlib.Path(r"D:\Data\Bangladesh_CMIP6_sublevels\IITM-ESM\ssp245")
 output_dir = input_dir / "output"
 output_dir.mkdir(parents=True, exist_ok=True)
 
 for file in input_dir.glob("**\*.nc"):
     
-    # create output CSV filename
-    out_file = output_dir / (file.stem + ".csv")
+    # # create output CSV filename
+    # out_file = output_dir / (file.stem + ".csv")
+    # create output JSON filename
+    f_name = file.stem.replace('Bangladesh_southasia_', '')
+    f_name = f_name.replace('_districts', '')
+    f_name = f_name.replace('_divisions', '_div')
+    out_file = output_dir / (f_name + ".json")
     
     if file.exists() and not out_file.exists():
         
@@ -50,4 +55,5 @@ for file in input_dir.glob("**\*.nc"):
         merged_df = merged_df.reset_index()
 
         # save dataframe to CSV
-        merged_df.to_csv(out_file, index=True, header=True)
+        # merged_df.to_csv(out_file, index=True, header=True)
+        merged_df.to_json(out_file)
