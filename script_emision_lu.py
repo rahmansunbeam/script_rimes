@@ -26,3 +26,7 @@ for file in input_dir.glob("**\*.nc"):
     df_2 = df[(df['lon'] > 0) & (df['lat'] > 0)]
 
     df_2.to_csv(out_file, index=True, header=True)
+
+# collect a grid of livestock population
+# multiply th grid values with national level emission
+# so that the total national emission stat

@@ -20,7 +20,7 @@ output_fishnet = r"E:\GIS_Files\BD_GLEAM3_Emission_bfl_milk.shp"
 backup_csv = r"D:\Workspace\script_rimes\backup.csv"
 
 # Construct the API URL for this cell
-dim_a_species_param = 'BFL' #CTL, GTS, BFL, CHK, PGS, SHP, ALL
+dim_a_species_param = 'CTL' #CTL, GTS, BFL, CHK, PGS, SHP, ALL
 dim_comm_param = 'MILK_PR' #EGGS_PR, MEAT_PR, MILK_PR
 
 count = 0
@@ -47,7 +47,8 @@ with arcpy.da.SearchCursor(output_fishnet, ["OID@", "SHAPE@"]) as search_cur:
         
         # GLW 4: Gridded Livestock Density
         # url = f"'https://io.apps.fao.org/gismgr/api/v1/GLW4/D_DA/2/wms?request=GetFeatureInfo&tiled=true&query_layers=D_DA&bbox={xmin},{ymin},{xmax},{ymax}&format=image/png&version=1.1.1&transparent=true&exceptions=application/vnd.ogc.se_xml&dim_a_species={dim_a_species_param}&srs=EPSG:3857&service=WMS&layers=D_DA&width=256&x=31&feature_count=101&y=14&styles&info_format=application/json&height=256'"
-
+        url = f"https://io.apps.fao.org/gismgr/api/v1/GLW4/D_DA/2/wms?request=GetFeatureInfo&tiled=true&query_layers=D_DA&bbox={xmin},{ymin},{xmax},{ymax}&format=image/png&version=1.1.1&transparent=true&exceptions=application/vnd.ogc.se_xml&dim_a_species={dim_a_species_param}&srs=EPSG:3857&service=WMS&layers=D_DA&width=256&x=185&feature_count=101&y=199&styles=&info_format=application/json&height=256"
+        
         # Make the API request and parse the JSON response
         response = urllib.request.urlopen(url)
         json_data = json.loads(response.read().decode('utf-8'))
