@@ -37,7 +37,8 @@ with arcpy.da.SearchCursor(output_fishnet, ["OID@", "SHAPE@"]) as search_cur:
         extent = search_row[1].extent
 
         # project the extent to WGS 1984 (WKID 4326) to get the coordinates in DD
-        extent_dd = extent.projectAs(arcpy.SpatialReference(4326))
+        # extent_dd = extent.projectAs(arcpy.SpatialReference(4326))
+        extent_dd = extent.projectAs(arcpy.SpatialReference(3857))
 
         # Get the extent of the cell
         xmax, ymax, xmin, ymin = round(extent_dd.XMax, 3), round(extent_dd.YMax, 3), round(extent_dd.XMin, 3), round(extent_dd.YMin, 3)
