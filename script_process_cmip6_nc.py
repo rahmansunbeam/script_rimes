@@ -11,7 +11,7 @@ import pathlib
 import xarray as xr
 import numpy as np
 
-input_dir = pathlib.Path(r"D:\Documents\RIMES\NETCDF\MRI-ESM2-0")
+input_dir = pathlib.Path(r"D:\Data\ACCESS-CM2\ssp585\r1i1p1f1\tas\month")
 
 for file in input_dir.glob("**\*.nc"):
     
@@ -34,6 +34,7 @@ for file in input_dir.glob("**\*.nc"):
             df = df.reset_index()
 
             df_col = [col for col in df.columns if col not in ['time', 'station', 'station_name']][0]
+            # df_col = [col for col in df.columns if col not in ['time', 'bnds', 'station', 'time_bnds', 'station_name']][0]
 
             # check if there is null values
             # print(df.isnull().sum())
@@ -43,14 +44,15 @@ for file in input_dir.glob("**\*.nc"):
             # df_1 = df.groupby([df['time'].dt.year, df['time'].dt.month, 'station_name'])['tasmin'].mean()
 
             # yearly average
-            # df_1 = df.groupby([df['time'].dt.year, 'station_name'])[df_col].mean()
+            df_1 = df.groupby([df['time'].dt.year, 'station_name'])[df_col].mean()
 
             # 30 year average
-            df_1 = df.groupby([np.floor(df['time'].dt.year/30)*30, 'station_name'])[df_col].mean()
+            # df_1 = df.groupby([np.floor(df['time'].dt.year/30)*30, 'station_name'])[df_col].mean()
 
             # convert series to dataframe
             # df_1 = df_1.to_frame().reset_index()
             df_1 = df_1.reset_index()
+            df_1['station_name'] = df_1['station_name'].str.decode('utf-8')
 
             # pivot dataframe
             df_2 = df_1.pivot('station_name', 'time').stack(0).rename_axis(['station_name', 'value'])
