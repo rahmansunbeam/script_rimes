@@ -10,14 +10,17 @@ __email__  = 'sunbeam.rahman@live.com'
 import arcpy
 
 # Input shapefile
-file = "D:\Dropbox\Workplace\RIMES\LU_Emission\BD_Emission_all_3.shp"
+file = "D:\Data\LU_Emission\BD_Emission_all_1.shp"
 
 # Gg/year CO2e
 emission_data = {
-    '2020': 69869,
-    '2030': 80618,
-    '2040': 94638,
-    '2050': 113098
+    '2005': 40495,
+    '2015': 41990,
+    '2018': 42637,
+    '2020': 42767,
+    '2030': 44352,
+    '2040': 46002,
+    '2050': 47718
 }  
 
 # Function to check if a field exists
