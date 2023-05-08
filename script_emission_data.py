@@ -16,7 +16,7 @@ arcpy.env.workspace = "E:\GIS_Files"
 arcpy.env.overwriteOutput = True
 
 # output_fishnet = r"E:\GIS_Files\BD_Fishnet.shp"
-output_fishnet = r"D:\Data\Livestock_Emission\BD_Emission_GTS.shp"
+output_fishnet = r"D:\Data\BD_Emission_all_1.shp"
 backup_csv = r"D:\Workspace\script_rimes\backup.csv"
 
 # Construct the API URL for this cell
