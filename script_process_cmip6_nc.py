@@ -11,7 +11,7 @@ import pathlib
 import xarray as xr
 import numpy as np
 
-input_dir = pathlib.Path(r"D:\Data\ACCESS-CM2\ssp585\r1i1p1f1\tas\month")
+input_dir = pathlib.Path(r"D:\Data\Nepal_indices\ACCESS-CM2\historical")
 
 for file in input_dir.glob("**\*.nc"):
     
@@ -19,7 +19,7 @@ for file in input_dir.glob("**\*.nc"):
     output_dir = input_dir / "output"
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    out_file = output_dir / (file.stem + ".csv")
+    out_file = output_dir / (file.stem + ".json")
     
     if file.exists():
 
@@ -52,7 +52,7 @@ for file in input_dir.glob("**\*.nc"):
             # convert series to dataframe
             # df_1 = df_1.to_frame().reset_index()
             df_1 = df_1.reset_index()
-            df_1['station_name'] = df_1['station_name'].str.decode('utf-8')
+            # df_1['station_name'] = df_1['station_name'].str.decode('utf-8')
 
             # pivot dataframe
             df_2 = df_1.pivot('station_name', 'time').stack(0).rename_axis(['station_name', 'value'])
@@ -62,6 +62,7 @@ for file in input_dir.glob("**\*.nc"):
                 df_2.rename(columns={col:'year_'+ str(col)},inplace=True)
 
             # finally export
-            df_2.to_csv(out_file, index=True, header=True)
+            # df_2.to_csv(out_file, index=True, header=True)
+            df_2.to_json(out_file)
             
     
