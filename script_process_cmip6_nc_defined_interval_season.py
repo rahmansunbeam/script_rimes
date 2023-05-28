@@ -30,6 +30,7 @@ f_name_dfs = {}
 
 for file in input_dir.glob("**\*.nc"):
     f_name = file.stem.replace('Bangladesh_southasia_', '').replace('_districts', '').replace('_divisions', '_div')
+    out_file = output_dir / (f_name + '_seasonal.json')
 
     if file.exists():
         ds = xr.open_dataset(file)
@@ -43,13 +44,11 @@ for file in input_dir.glob("**\*.nc"):
             interval_mask = df['time'].between(interval_start, interval_end)
 
             for season, months in seasons:
-                out_file = output_dir / (f_name + '_{}_{}_{}.json'.format(season, interval_start.year, interval_end.year))
 
                 if not out_file.exists():
                     seasonal_df = df.loc[interval_mask & df['time'].dt.month.isin(months)]
                     seasonal_avg = seasonal_df.groupby(['station', 'station_name']).mean()[df_col]
                     seasonal_avg.columns = ['year_{}_{}_{}'.format(season, interval_start.year, interval_end.year)]
-
                     seasonal_avgs.append(seasonal_avg)
                     # break
 
@@ -57,7 +56,6 @@ for file in input_dir.glob("**\*.nc"):
         f_name_dfs[f_name] = pd.concat(seasonal_avgs, axis=1)
 
 # Save merged DataFrames to JSON
-for f_name, df in f_name_dfs.items():
-    out_file = output_dir / (f_name + '_seasonal.json')
+for f_name, df in f_name_dfs.items():    
     df.to_json(out_file)
 
