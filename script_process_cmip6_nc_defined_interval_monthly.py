@@ -19,8 +19,8 @@ intervals = [(pd.Timestamp('2021-01-01'), pd.Timestamp('2050-12-31')),
              (pd.Timestamp('2061-01-01'), pd.Timestamp('2090-12-31')),
              (pd.Timestamp('2071-01-01'), pd.Timestamp('2100-12-31'))]
 
-# Define seasons
-seasons = [('DJF', [12, 1, 2]), ('MAM', [3, 4, 5]), ('JJA', [6, 7, 8]), ('SON', [9, 10, 11])]
+# Define months
+months = {1: 'Jan', 2: 'Feb', 3: 'Mar', 4: 'Apr', 5: 'May', 6: 'Jun', 7: 'Jul', 8: 'Aug', 9: 'Sep', 10: 'Oct', 11: 'Nov', 12: 'Dec'}
 
 input_dir = pathlib.Path(r"D:\Data\CMIP6\ACCESS-CM2\ssp245")
 output_dir = input_dir / "output"
@@ -30,34 +30,31 @@ f_name_dfs = {}
 
 for file in input_dir.glob("**\*.nc"):
     f_name = file.stem.replace('Bangladesh_southasia_', '').replace('_districts', '').replace('_divisions', '_div')
+    out_file = output_dir / (f_name + '_monthly.json')
 
     if file.exists():
         ds = xr.open_dataset(file)
         df = ds.to_dataframe().reset_index()
         df_col = [col for col in df.columns if col not in ['time', 'station', 'station_name']]
 
-        seasonal_avgs = []
-        # Calculate seasonal averages for each interval
+        monthly_avgs = []
+        # Calculate monthly averages for each interval
         for interval in intervals:
             interval_start, interval_end = interval
             interval_mask = df['time'].between(interval_start, interval_end)
 
-            for season, months in seasons:
-                out_file = output_dir / (f_name + '_{}_{}_{}.json'.format(season, interval_start.year, interval_end.year))
+            for month, month_name in months.items():
 
                 if not out_file.exists():
-                    seasonal_df = df.loc[interval_mask & df['time'].dt.month.isin(months)]
-                    seasonal_avg = seasonal_df.groupby(['station', 'station_name']).mean()[df_col]
-                    seasonal_avg.columns = ['year_{}_{}_{}'.format(season, interval_start.year, interval_end.year)]
-
-                    seasonal_avgs.append(seasonal_avg)
-                    # break
+                    monthly_df = df.loc[interval_mask & (df['time'].dt.month == month)]
+                    monthly_avg = monthly_df.groupby(['station', 'station_name']).mean()[df_col]
+                    monthly_avg.columns = ['year_{}_{}_{}'.format(month_name, interval_start.year, interval_end.year)]
+                    monthly_avgs.append(monthly_avg)
 
         # Store DataFrame in dict
-        f_name_dfs[f_name] = pd.concat(seasonal_avgs, axis=1)
+        f_name_dfs[f_name] = pd.concat(monthly_avgs, axis=1)
 
 # Save merged DataFrames to JSON
 for f_name, df in f_name_dfs.items():
-    out_file = output_dir / (f_name + '_seasonal.json')
     df.to_json(out_file)
 
