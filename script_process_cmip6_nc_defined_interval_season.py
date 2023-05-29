@@ -22,7 +22,7 @@ intervals = [(pd.Timestamp('2021-01-01'), pd.Timestamp('2050-12-31')),
 # Define seasons
 seasons = [('DJF', [12, 1, 2]), ('MAM', [3, 4, 5]), ('JJA', [6, 7, 8]), ('SON', [9, 10, 11])]
 
-input_dir = pathlib.Path(r"D:\Data\CMIP6\ACCESS-CM2\ssp245")
+input_dir = pathlib.Path(r"D:\Data\Bangladesh_CMIP6_sublevels\BCC-CSM2-MR\ssp245")
 output_dir = input_dir / "output"
 output_dir.mkdir(parents=True, exist_ok=True)
 
@@ -47,6 +47,7 @@ for file in input_dir.glob("**\*.nc"):
 
                 if not out_file.exists():
                     seasonal_df = df.loc[interval_mask & df['time'].dt.month.isin(months)]
+                    print("dim of {} for {}, {}-{} is {}".format(f_name, season, interval_start.year, interval_end.year, seasonal_df.shape))
                     seasonal_avg = seasonal_df.groupby(['station', 'station_name']).mean()[df_col]
                     seasonal_avg.columns = ['year_{}_{}_{}'.format(season, interval_start.year, interval_end.year)]
                     seasonal_avgs.append(seasonal_avg)
@@ -57,5 +58,6 @@ for file in input_dir.glob("**\*.nc"):
 
 # Save merged DataFrames to JSON
 for f_name, df in f_name_dfs.items():    
+    out_file = output_dir / (f_name + '_seasonal.json')
     df.to_json(out_file)
 

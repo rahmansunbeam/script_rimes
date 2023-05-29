@@ -47,6 +47,7 @@ for file in input_dir.glob("**\*.nc"):
 
                 if not out_file.exists():
                     monthly_df = df.loc[interval_mask & (df['time'].dt.month == month)]
+                    print("dim of {} for {}, {}-{} is {}".format(f_name, month_name, interval_start.year, interval_end.year, monthly_df.shape))
                     monthly_avg = monthly_df.groupby(['station', 'station_name']).mean()[df_col]
                     monthly_avg.columns = ['year_{}_{}_{}'.format(month_name, interval_start.year, interval_end.year)]
                     monthly_avgs.append(monthly_avg)
@@ -56,5 +57,6 @@ for file in input_dir.glob("**\*.nc"):
 
 # Save merged DataFrames to JSON
 for f_name, df in f_name_dfs.items():
+    out_file = output_dir / (f_name + '_monthly.json')
     df.to_json(out_file)
 
