@@ -11,7 +11,7 @@ import pandas as pd
 import re
 import pathlib
 
-input_dir = pathlib.Path(r"D:\Data\Nepal_indices\CanESM5\historical")
+input_dir = pathlib.Path(r"D:\Data\CLIMDATA_MAIN\UKESM1-0-LL\ssp585")
 output_dir = input_dir / "output"
 output_dir.mkdir(parents=True, exist_ok=True)
 
@@ -51,6 +51,18 @@ def process_def_2(file):
     print(file.stem)
     csv_3.to_json(out_file)
 
-for file in input_dir.glob("**\*.csv"):
+def process_def_3(file):
+    out_file = output_dir / (file.stem + ".csv")
+    csv = pd.read_csv(file, index_col=False).fillna(0)
+    csv['date'] = "year_" + pd.to_datetime(csv['date']).dt.year.astype(str)
 
-    process_def_2(file)
+    csv_2 = csv.T
+    csv_2.columns = csv_2.iloc[0]
+    csv_2 = csv_2.iloc[1:]
+    
+    print(file.stem)
+    csv_2.to_csv(out_file)
+
+for file in input_dir.glob("*yearly*.csv"):
+
+    process_def_3(file)
