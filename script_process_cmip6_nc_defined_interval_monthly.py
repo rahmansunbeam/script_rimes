@@ -22,7 +22,7 @@ intervals = [(pd.Timestamp('2021-01-01'), pd.Timestamp('2050-12-31')),
 # Define months
 months = {1: 'Jan', 2: 'Feb', 3: 'Mar', 4: 'Apr', 5: 'May', 6: 'Jun', 7: 'Jul', 8: 'Aug', 9: 'Sep', 10: 'Oct', 11: 'Nov', 12: 'Dec'}
 
-input_dir = pathlib.Path(r"D:\Data\CMIP6\ACCESS-CM2\ssp245")
+input_dir = pathlib.Path(r"D:\Data\CLIMDATA_MAIN\UKESM1-0-LL\ssp245")
 output_dir = input_dir / "output"
 output_dir.mkdir(parents=True, exist_ok=True)
 

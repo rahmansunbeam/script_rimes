@@ -23,9 +23,7 @@ arcpy.env.qualifiedFieldNames = False
 
 for t in tables:
     joined_fc = arcpy.management.AddJoin('BD_District_clim', 'Dist_nc', t, 'station_name')
-    t = t.replace('-', '_')
-    t = t.replace('Bangladesh_southasia', '')
-    t = t.replace('_districts.csv', '')
+    t = t.replace('-', '_').replace('Bangladesh_southasia', '').replace('_districts.csv', '')
     # arcpy.management.CopyFeatures(joined_fc, output_fc + '\BD_District' + t)
     arcpy.management.CopyFeatures(joined_fc, output_shp + '\\' + t)
     arcpy.management.RemoveJoin(joined_fc)
