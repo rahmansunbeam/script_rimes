@@ -1,11 +1,11 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*- 
+# -*- coding: utf-8 -*-
 
 __author__ = 'Sunbeam Rahman'
 __date__   = '21/03/2023 17:12:04'
 __email__  = 'sunbeam.rahman@live.com'
 
-## -------------------------------- ## 
+## -------------------------------- ##
 
 import pandas as pd
 import pathlib
@@ -31,20 +31,14 @@ def process_data(input_dir, output_dir, is_humidity):
 
     def calculate_yearly_average(df, interval_start, interval_end):
         station_names = df.columns[1:]
-        result_df = pd.DataFrame(columns=['station_name', f'year_{interval_start.year}_{interval_end.year}'])
+        result_df = {}
 
         for station_name in station_names:
-            station_df = df[['date', station_name]]            
+            station_df = df[['date', station_name]]
             interval_df = station_df.loc[station_df['date'].between(interval_start, interval_end)]
-            interval_mean = interval_df.mean(numeric_only=True).to_frame().T
-            
-            interval_mean['station_name'] = station_name
-            interval_mean.columns = [f'year_{interval_start.year}_{interval_end.year}', 'station_name']
-            result_df = pd.concat([result_df, interval_mean], ignore_index=True)
-            print(result_df)
-            break
-        
-        print(result_df)
+            interval_mean = interval_df.mean(numeric_only=True)
+            result_df[interval_mean.keys()[0]] = interval_mean[station_name]
+
         return result_df
 
     def remove_february_nats(df):
@@ -53,7 +47,7 @@ def process_data(input_dir, output_dir, is_humidity):
         df = df.drop(columns='month')
         return df
 
-    for file in input_dir.glob("**/*.csv"):
+    for file in input_dir.glob("**/*daily_ssp245.csv"):
         out_file = output_dir / (file.stem + ".csv")
 
         if file.exists() and not out_file.exists():
@@ -62,20 +56,20 @@ def process_data(input_dir, output_dir, is_humidity):
             df = adjust_calendar(df, calendar)
             df = remove_february_nats(df)
 
-            interval_dfs = []
+            output_dfs = {}
+
             for interval in intervals:
                 interval_start, interval_end = interval
                 interval_df = calculate_yearly_average(df, interval_start, interval_end)
-                interval_dfs.append(interval_df)
 
-            merged_df = pd.concat(interval_dfs, axis=1)
-            merged_df_cols = ['station_name'] + [f'year_{interval_start.year}_{interval_end.year}' for interval_start, interval_end in intervals]
-            merged_df = merged_df[merged_df_cols]
-            print(merged_df)
-            # merged_df = merged_df.drop_duplicates(subset='station_name')
-            # merged_df.to_csv(out_file, index=False, header=True)
+                for key, value in interval_df.items():
+                    output_dfs[key] = output_dfs.get(key, []) + [value]
 
-input_dir = r"D:\DOCUMENTS\RIMES\CLIMDATA"
-output_dir = r"D:\DOCUMENTS\RIMES\CLIMDATA\output"
+            output_dfs = pd.DataFrame(output_dfs).T.reset_index()
+            output_dfs.columns = ['station_name'] + [f'year_{interval_start.year}_{interval_end.year}' for interval_start, interval_end in intervals]
+            output_dfs.to_csv(out_file, index=False, header=True)
+
+input_dir = r"D:\Data\CLIMDATA_MAIN\UKESM1-0-LL\output"
+output_dir = r"D:\Data\CLIMDATA_MAIN\UKESM1-0-LL\output\output"
 
 process_data(input_dir, output_dir, is_humidity=True)
