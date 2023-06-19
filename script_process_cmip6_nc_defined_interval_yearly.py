@@ -23,16 +23,13 @@ input_dir = pathlib.Path(r"D:\Data\Bangladesh_indices\ACCESS-CM2\ssp585\r1i1p1f1
 output_dir = input_dir / "output"
 output_dir.mkdir(parents=True, exist_ok=True)
 
-for file in input_dir.glob("**\*.nc"):
+for file in input_dir.glob("**\*_year_Bangladesh_ACCESS-CM2_*.nc"):
     
     # # create output CSV filename
     # out_file = output_dir / (file.stem + ".csv")
     # create output JSON filename
-    # f_name = file.stem.replace('Bangladesh_southasia_', '')
-    f_name = file.stem.replace('index_', '')
-    f_name = f_name.replace('_districts', '')
-    f_name = f_name.replace('_divisions', '_div')
-    out_file = output_dir / (f_name + ".json")
+    f_name = file.stem.replace('Bangladesh_southasia_', '').replace('index_', '').replace('_districts', '').replace('_divisions', '_div')
+    out_file = output_dir / (f_name + ".csv")
     
     if file.exists() and not out_file.exists():
         
@@ -47,14 +44,22 @@ for file in input_dir.glob("**\*.nc"):
         for interval in intervals:
             interval_start, interval_end = interval
             interval_mask = df['time'].between(interval_start, interval_end)
-            interval_df = df.loc[interval_mask, :].groupby(['station', 'station_name']).mean()[df_col]
-            interval_df.columns = ['year_{}_{}'.format(interval_start.year, interval_end.year)]
-            interval_dfs.append(interval_df)
+
+            # sum yearly precipitation before make a average
+            interval_yearly_sum = df.loc[interval_mask].groupby(['station', 'station_name', df['time'].dt.year]).sum()[df_col]
+            interval_yearly_mean = interval_yearly_sum.groupby(['station', 'station_name']).mean()
+            interval_yearly_mean.columns = ['year_{}_{}'.format(interval_start.year, interval_end.year)]
+            interval_dfs.append(interval_yearly_mean)
+
+            # 30-year mean
+            # interval_df = df.loc[interval_mask, :].groupby(['station', 'station_name']).mean()[df_col]
+            # interval_df.columns = ['year_{}_{}'.format(interval_start.year, interval_end.year)]
+            # interval_dfs.append(interval_df)
 
         # merge interval averages into one dataframe
         merged_df = pd.concat(interval_dfs, axis=1)
         merged_df = merged_df.reset_index()
 
         # save dataframe to CSV
-        # merged_df.to_csv(out_file, index=True, header=True)
-        merged_df.to_json(out_file)
+        merged_df.to_csv(out_file, index=False, header=True)
+        # merged_df.to_json(out_file)
