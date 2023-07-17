@@ -22,7 +22,7 @@ intervals = [(pd.Timestamp('2021-01-01'), pd.Timestamp('2050-12-31')),
 # Define seasons
 seasons = [('DJF', [12, 1, 2]), ('MAM', [3, 4, 5]), ('JJA', [6, 7, 8]), ('SON', [9, 10, 11])]
 
-input_dir = pathlib.Path(r"D:\Data\Bangladesh_CMIP6_sublevels\MPI-ESM1-2-HR\ssp585")
+input_dir = pathlib.Path(r"D:\Data\Bangladesh_CMIP6_sublevels\ACCESS-CM2\ssp245\r1i1p1f1\tas")
 output_dir = input_dir / "output"
 output_dir.mkdir(parents=True, exist_ok=True)
 
@@ -58,6 +58,7 @@ for file in input_dir.glob("**\*.nc"):
 
 # Save merged DataFrames to JSON
 for f_name, df in f_name_dfs.items():    
-    out_file = output_dir / (f_name + '_seasonal.json')
-    df.to_json(out_file)
+    out_file = output_dir / (f_name + '_seasonal.csv')
+    # df.to_json(out_file)
+    df.to_csv(out_file, index=True, header=True)
 

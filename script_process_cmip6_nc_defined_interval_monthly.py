@@ -22,7 +22,7 @@ intervals = [(pd.Timestamp('2021-01-01'), pd.Timestamp('2050-12-31')),
 # Define months
 months = {1: 'Jan', 2: 'Feb', 3: 'Mar', 4: 'Apr', 5: 'May', 6: 'Jun', 7: 'Jul', 8: 'Aug', 9: 'Sep', 10: 'Oct', 11: 'Nov', 12: 'Dec'}
 
-input_dir = pathlib.Path(r"D:\Data\CLIMDATA_MAIN\UKESM1-0-LL\ssp245")
+input_dir = pathlib.Path(r"D:\Data\Bangladesh_CMIP6_sublevels\ACCESS-CM2\ssp245\r1i1p1f1\tas")
 output_dir = input_dir / "output"
 output_dir.mkdir(parents=True, exist_ok=True)
 
@@ -30,7 +30,8 @@ f_name_dfs = {}
 
 for file in input_dir.glob("**\*.nc"):
     f_name = file.stem.replace('Bangladesh_southasia_', '').replace('_districts', '').replace('_divisions', '_div')
-    out_file = output_dir / (f_name + '_monthly.json')
+    # out_file = output_dir / (f_name + '_monthly.json')
+    out_file = output_dir / (f_name + '_monthly.csv')
 
     if file.exists():
         ds = xr.open_dataset(file)
@@ -57,6 +58,7 @@ for file in input_dir.glob("**\*.nc"):
 
 # Save merged DataFrames to JSON
 for f_name, df in f_name_dfs.items():
-    out_file = output_dir / (f_name + '_monthly.json')
-    df.to_json(out_file)
+    out_file = output_dir / (f_name + '_monthly.csv')
+    # df.to_json(out_file)
+    df.to_csv(out_file, index=True, header=True)
 

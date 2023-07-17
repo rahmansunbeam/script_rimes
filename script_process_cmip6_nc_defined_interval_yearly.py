@@ -19,11 +19,11 @@ intervals = [(pd.Timestamp('2021-01-01'), pd.Timestamp('2050-12-31')),
              (pd.Timestamp('2061-01-01'), pd.Timestamp('2090-12-31')),
              (pd.Timestamp('2071-01-01'), pd.Timestamp('2100-12-31'))]
 
-input_dir = pathlib.Path(r"D:\Data\Bangladesh_indices\ACCESS-CM2\ssp585\r1i1p1f1\pr")
+input_dir = pathlib.Path(r"D:\Data\Bangladesh_CMIP6_sublevels\ACCESS-CM2\ssp245\r1i1p1f1\tas")
 output_dir = input_dir / "output"
 output_dir.mkdir(parents=True, exist_ok=True)
 
-for file in input_dir.glob("**\*_year_Bangladesh_ACCESS-CM2_*.nc"):
+for file in input_dir.glob("**\*.nc"):
     
     # # create output CSV filename
     # out_file = output_dir / (file.stem + ".csv")
@@ -51,7 +51,7 @@ for file in input_dir.glob("**\*_year_Bangladesh_ACCESS-CM2_*.nc"):
             interval_yearly_mean.columns = ['year_{}_{}'.format(interval_start.year, interval_end.year)]
             interval_dfs.append(interval_yearly_mean)
 
-            # 30-year mean
+            # # 30-year mean
             # interval_df = df.loc[interval_mask, :].groupby(['station', 'station_name']).mean()[df_col]
             # interval_df.columns = ['year_{}_{}'.format(interval_start.year, interval_end.year)]
             # interval_dfs.append(interval_df)
