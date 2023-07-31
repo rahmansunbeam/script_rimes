@@ -12,27 +12,28 @@ import xarray as xr
 import pandas as pd
 from datetime import datetime
 
-input_dir = pathlib.Path(r"D:\Data\Bangladesh_CMIP6_sublevels\ACCESS-CM2\ssp245\r1i1p1f1\tas")
+input_dir = pathlib.Path(r"D:\Data\Bangladesh_indices\ACCESS-CM2\ssp585\r1i1p1f1")
 
 # Define month mapping
 month_dict = {1: 'Jan', 2: 'Feb', 3: 'Mar', 4: 'Apr', 5: 'May', 6: 'Jun', 7: 'Jul', 8: 'Aug', 9: 'Sep', 10: 'Oct', 11: 'Nov', 12: 'Dec'}
 
-for file in input_dir.glob("*.nc"):
+for file in input_dir.glob("**\*.nc"):
 
     output_dir = input_dir / "output"
     output_dir.mkdir(parents=True, exist_ok=True)
 
     f_name = file.stem.replace('index_', '').replace('Bangladesh_southasia', 'BD').replace('_districts', '').replace('_divisions', '_div')
-    out_file = output_dir / (f_name + "_monthly.csv")
+    # out_file = output_dir / (f_name + "_monthly.csv")
+    out_file = output_dir / (f_name + "_monthly.json")
 
-    if file.exists() and not out_file.exists():
+    if file.exists() and not out_file.exists() and file.parent.name == "pr":
 
         print("processing: {}".format(file))
 
         ds = xr.open_dataset(file)
         df = ds.to_dataframe().reset_index()
         df_col = [col for col in df.columns if col not in ['time', 'station', 'station_name']][0]
-        df_1 = df.groupby([df['time'].dt.year.astype(str) + "_" + df['time'].dt.month.map(month_dict), 'station_name'])[df_col].mean()
+        df_1 = df.groupby([df['time'].dt.year.astype(str) + "_" + df['time'].dt.month.map(month_dict), 'station_name'])[df_col].sum()
 
         df_1.index = df_1.index.set_levels(df_1.index.levels[0].map(lambda x: datetime.strptime(x, '%Y_%b')), level=0)
         df_1.sort_index(inplace=True)
@@ -43,4 +44,6 @@ for file in input_dir.glob("*.nc"):
             form_col = pd.to_datetime(col).strftime('%Y_%b')
             df_2.rename(columns={col:'month_'+ form_col},inplace=True)
 
-        df_2.to_csv(out_file, index=True, header=True)
+        # df_2.to_csv(out_file, index=True, header=True)
+        df_2.to_json(out_file)
+        

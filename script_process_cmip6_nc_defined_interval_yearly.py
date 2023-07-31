@@ -19,7 +19,7 @@ intervals = [(pd.Timestamp('2021-01-01'), pd.Timestamp('2050-12-31')),
              (pd.Timestamp('2061-01-01'), pd.Timestamp('2090-12-31')),
              (pd.Timestamp('2071-01-01'), pd.Timestamp('2100-12-31'))]
 
-input_dir = pathlib.Path(r"D:\Data\Bangladesh_CMIP6_sublevels\ACCESS-CM2\ssp245\r1i1p1f1\tas")
+input_dir = pathlib.Path(r"D:\Data\Bangladesh_indices\BCC-CSM2-MR\ssp585\r1i1p1f1")
 output_dir = input_dir / "output"
 output_dir.mkdir(parents=True, exist_ok=True)
 
@@ -29,7 +29,8 @@ for file in input_dir.glob("**\*.nc"):
     # out_file = output_dir / (file.stem + ".csv")
     # create output JSON filename
     f_name = file.stem.replace('Bangladesh_southasia_', '').replace('index_', '').replace('_districts', '').replace('_divisions', '_div')
-    out_file = output_dir / (f_name + ".csv")
+    # out_file = output_dir / (f_name + ".csv")
+    out_file = output_dir / (f_name + ".json")
     
     if file.exists() and not out_file.exists():
         
@@ -44,12 +45,16 @@ for file in input_dir.glob("**\*.nc"):
         for interval in intervals:
             interval_start, interval_end = interval
             interval_mask = df['time'].between(interval_start, interval_end)
-
-            # sum yearly precipitation before make a average
             interval_yearly_sum = df.loc[interval_mask].groupby(['station', 'station_name', df['time'].dt.year]).sum()[df_col]
-            interval_yearly_mean = interval_yearly_sum.groupby(['station', 'station_name']).mean()
-            interval_yearly_mean.columns = ['year_{}_{}'.format(interval_start.year, interval_end.year)]
-            interval_dfs.append(interval_yearly_mean)
+            interval_yearly_mean = df.loc[interval_mask].groupby(['station', 'station_name', df['time'].dt.year]).mean()[df_col]
+
+            if file.parent.name == "pr":
+                interval_yearly_cal = interval_yearly_sum.groupby(['station', 'station_name']).sum()
+            else:
+                interval_yearly_cal = interval_yearly_mean.groupby(['station', 'station_name']).mean()
+                
+            interval_yearly_cal.columns = ['year_{}_{}'.format(interval_start.year, interval_end.year)]
+            interval_dfs.append(interval_yearly_cal)
 
             # # 30-year mean
             # interval_df = df.loc[interval_mask, :].groupby(['station', 'station_name']).mean()[df_col]
@@ -61,5 +66,5 @@ for file in input_dir.glob("**\*.nc"):
         merged_df = merged_df.reset_index()
 
         # save dataframe to CSV
-        merged_df.to_csv(out_file, index=False, header=True)
-        # merged_df.to_json(out_file)
+        # merged_df.to_csv(out_file, index=False, header=True)
+        merged_df.to_json(out_file)
