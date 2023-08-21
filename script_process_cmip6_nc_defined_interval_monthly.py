@@ -22,13 +22,13 @@ intervals = [(pd.Timestamp('2021-01-01'), pd.Timestamp('2050-12-31')),
 # Define months
 months = {1: 'Jan', 2: 'Feb', 3: 'Mar', 4: 'Apr', 5: 'May', 6: 'Jun', 7: 'Jul', 8: 'Aug', 9: 'Sep', 10: 'Oct', 11: 'Nov', 12: 'Dec'}
 
-input_dir = pathlib.Path(r"D:\Data\Bangladesh_indices\BCC-CSM2-MR\ssp585\r1i1p1f1")
+input_dir = pathlib.Path(r"D:\Data\Bangladesh_CMIP6_sublevels\MIROC6\ssp585\r1i1p1f1")
 output_dir = input_dir / "output"
 output_dir.mkdir(parents=True, exist_ok=True)
-
+accumulated = 'avg' #'avg', 'sum'
 f_name_dfs = {}
 
-for file in input_dir.glob("**\*month*.nc"):
+for file in input_dir.glob("**\*.nc"):
     f_name = file.stem.replace('Bangladesh_southasia_', '').replace('index_', '').replace('_districts', '').replace('_divisions', '_div')
     out_file = output_dir / (f_name + '_monthly.json')
     # out_file = output_dir / (f_name + '_monthly.csv')
@@ -52,11 +52,16 @@ for file in input_dir.glob("**\*month*.nc"):
                     monthly_df = df.loc[interval_mask & (df['time'].dt.month == month)]
                     # print("dim of {} for {}, {}-{} is {}".format(f_name, month_name, interval_start.year, interval_end.year, monthly_df.shape))
 
-                    if file.parent.name == "pr":
-                        monthly_cal = monthly_df.groupby(['station']).sum()[df_col]
-                    else:
+                    if accumulated == 'sum':
+                        if file.parent.name == "pr":
+                            monthly_cal = monthly_df.groupby(['station']).sum()[df_col]
+                        else:
+                            monthly_cal = monthly_df.groupby(['station']).mean()[df_col]
+                    elif accumulated == 'avg':
                         monthly_cal = monthly_df.groupby(['station']).mean()[df_col]
-                        
+                    else:
+                        print('error in accumulated param')
+
                     monthly_cal.columns = ['year_{}_{}_{}'.format(month_name, interval_start.year, interval_end.year)]
                     monthly_avgs.append(monthly_cal)
 
@@ -66,7 +71,7 @@ for file in input_dir.glob("**\*month*.nc"):
 # Save merged DataFrames to JSON
 for f_name, df in f_name_dfs.items():
     # out_file = output_dir / (f_name + '_monthly.csv')
-    out_file = output_dir / (f_name + '_monthly.json')    
+    out_file = output_dir / (f_name + '_monthly.json')
     # df.to_csv(out_file, index=True, header=True)
     df.to_json(out_file)
 

@@ -1,11 +1,11 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*- 
+# -*- coding: utf-8 -*-
 
 __author__ = 'Sunbeam Rahman'
 __date__   = '21/03/2023 17:12:04'
 __email__  = 'sunbeam.rahman@live.com'
 
-## -------------------------------- ## 
+## -------------------------------- ##
 
 import pandas as pd
 import xarray as xr
@@ -19,21 +19,22 @@ intervals = [(pd.Timestamp('2021-01-01'), pd.Timestamp('2050-12-31')),
              (pd.Timestamp('2061-01-01'), pd.Timestamp('2090-12-31')),
              (pd.Timestamp('2071-01-01'), pd.Timestamp('2100-12-31'))]
 
-input_dir = pathlib.Path(r"D:\Data\Bangladesh_indices\BCC-CSM2-MR\ssp585\r1i1p1f1")
+input_dir = pathlib.Path(r"DD:\Data\Bangladesh_CMIP6_sublevels\MIROC6\ssp585\r1i1p1f1")
 output_dir = input_dir / "output"
 output_dir.mkdir(parents=True, exist_ok=True)
+accumulated = 'avg' #'avg', 'sum'
 
 for file in input_dir.glob("**\*.nc"):
-    
+
     # # create output CSV filename
     # out_file = output_dir / (file.stem + ".csv")
     # create output JSON filename
     f_name = file.stem.replace('Bangladesh_southasia_', '').replace('index_', '').replace('_districts', '').replace('_divisions', '_div')
     # out_file = output_dir / (f_name + ".csv")
     out_file = output_dir / (f_name + ".json")
-    
+
     if file.exists() and not out_file.exists():
-        
+
         print("processing: {}".format(file))
 
         ds = xr.open_dataset(file)
@@ -48,11 +49,15 @@ for file in input_dir.glob("**\*.nc"):
             interval_yearly_sum = df.loc[interval_mask].groupby(['station', 'station_name', df['time'].dt.year]).sum()[df_col]
             interval_yearly_mean = df.loc[interval_mask].groupby(['station', 'station_name', df['time'].dt.year]).mean()[df_col]
 
-            if file.parent.name == "pr":
-                interval_yearly_cal = interval_yearly_sum.groupby(['station', 'station_name']).sum()
-            else:
+            if accumulated == 'sum':
+                if file.parent.name == "pr":
+                    interval_yearly_cal = interval_yearly_sum.groupby(['station', 'station_name']).sum()
+                else:
+                    interval_yearly_cal = interval_yearly_mean.groupby(['station', 'station_name']).mean()
+            elif accumulated == 'avg':
                 interval_yearly_cal = interval_yearly_mean.groupby(['station', 'station_name']).mean()
-                
+            else:
+                print('error in accumulated param')
             interval_yearly_cal.columns = ['year_{}_{}'.format(interval_start.year, interval_end.year)]
             interval_dfs.append(interval_yearly_cal)
 
