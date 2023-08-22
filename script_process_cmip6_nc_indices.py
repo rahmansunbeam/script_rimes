@@ -63,21 +63,25 @@ def process_data(input_dir, output_dir, average_typ, accumulated):
 
                     if accumulated == 'sum':
                         if file.parent.name == "pr":
-                            df_1 = df.groupby([df['time'].dt.year.astype(str) + "_" + df['time'].dt.month.map(month_dict), 'station'])[df_col].sum()
+                            # df_1 = df.groupby([df['time'].dt.year.astype(str) + "_" + df['time'].dt.month.map(month_dict), 'station'])[df_col].sum()
+                            df_1 = df.groupby([df['time'].dt.month.map(month_dict), 'station'])[df_col].sum()/64
                         else:
-                            df_1 = df.groupby([df['time'].dt.year.astype(str) + "_" + df['time'].dt.month.map(month_dict), 'station'])[df_col].mean()
+                            # df_1 = df.groupby([df['time'].dt.year.astype(str) + "_" + df['time'].dt.month.map(month_dict), 'station'])[df_col].mean()
+                            df_1 = df.groupby([df['time'].dt.month.map(month_dict), 'station'])[df_col].mean()
                     elif accumulated == 'avg':
                         df_1 = df.groupby([df['time'].dt.year.astype(str) + "_" + df['time'].dt.month.map(month_dict), 'station'])[df_col].mean()
                     else:
                         print('error in accumulated param')
 
-                    df_1.index = df_1.index.set_levels(df_1.index.levels[0].map(lambda x: datetime.strptime(x, '%Y_%b')), level=0)
+                    # df_1.index = df_1.index.set_levels(df_1.index.levels[0].map(lambda x: datetime.strptime(x, '%Y_%b')), level=0)
+                    df_1.index = df_1.index.set_levels(df_1.index.levels[0].map(lambda x: datetime.strptime(x, '%b')), level=0)
                     df_1.sort_index(inplace=True)
                     df_2 = df_1.reset_index().pivot('station', 'time').stack(0).rename_axis(['station', 'value']).reset_index().drop(['value'], axis=1)
 
                     for col in df_2.columns:
                         if col not in ['station', 'time']:
-                            form_col = pd.to_datetime(col).strftime('%Y_%b')
+                            # form_col = pd.to_datetime(col).strftime('%Y_%b')
+                            form_col = pd.to_datetime(col).strftime('%b')
                             df_2.rename(columns={col:'month_'+ form_col},inplace=True)
 
                 elif average_typ == 'seasonal':
@@ -110,7 +114,7 @@ def process_data(input_dir, output_dir, average_typ, accumulated):
                 # finally export
                 df_2.to_json(out_file)
 
-input_dir = r"D:\Data\Bangladesh_CMIP6_sublevels\MIROC6\ssp585\r1i1p1f1"
-output_dir = r"D:\Data\Bangladesh_CMIP6_sublevels\MIROC6\ssp585\r1i1p1f1\output"
+input_dir = r"D:\Data\Bangladesh_CMIP6_sublevels\ACCESS-CM2\historical\r1i1p1f1"
+output_dir = r"D:\Data\Bangladesh_CMIP6_sublevels\ACCESS-CM2\historical\r1i1p1f1\output"
 
-process_data(input_dir, output_dir, average_typ='yearly', accumulated = 'avg') # yearly, monthly, seasonal; avg, sum
+process_data(input_dir, output_dir, average_typ='monthly', accumulated = 'sum') # yearly, monthly, seasonal; avg, sum

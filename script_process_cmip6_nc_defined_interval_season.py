@@ -22,7 +22,7 @@ intervals = [(pd.Timestamp('2021-01-01'), pd.Timestamp('2050-12-31')),
 # Define seasons
 seasons = [('DJF', [12, 1, 2]), ('MAM', [3, 4, 5]), ('JJA', [6, 7, 8]), ('SON', [9, 10, 11])]
 
-input_dir = pathlib.Path(r"D:\Data\Bangladesh_CMIP6_sublevels\MIROC6\ssp585\r1i1p1f1")
+input_dir = pathlib.Path(r"D:\Data\Bangladesh_CMIP6_sublevels\ACCESS-CM2\historical\r1i1p1f1")
 output_dir = input_dir / "output"
 output_dir.mkdir(parents=True, exist_ok=True)
 accumulated = 'avg' #'avg', 'sum'
