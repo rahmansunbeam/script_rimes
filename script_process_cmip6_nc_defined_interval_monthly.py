@@ -11,21 +11,32 @@ import pandas as pd
 import xarray as xr
 import pathlib
 
-# Define time intervals
-intervals = [(pd.Timestamp('2021-01-01'), pd.Timestamp('2050-12-31')),
-             (pd.Timestamp('2031-01-01'), pd.Timestamp('2060-12-31')),
-             (pd.Timestamp('2041-01-01'), pd.Timestamp('2070-12-31')),
-             (pd.Timestamp('2051-01-01'), pd.Timestamp('2080-12-31')),
-             (pd.Timestamp('2061-01-01'), pd.Timestamp('2090-12-31')),
-             (pd.Timestamp('2071-01-01'), pd.Timestamp('2100-12-31'))]
+# # Define time intervals, these are for calculating tri-decadal stat
+# intervals = [(pd.Timestamp('2021-01-01'), pd.Timestamp('2050-12-31')),
+#              (pd.Timestamp('2031-01-01'), pd.Timestamp('2060-12-31')),
+#              (pd.Timestamp('2041-01-01'), pd.Timestamp('2070-12-31')),
+#              (pd.Timestamp('2051-01-01'), pd.Timestamp('2080-12-31')),
+#              (pd.Timestamp('2061-01-01'), pd.Timestamp('2090-12-31')),
+#              (pd.Timestamp('2071-01-01'), pd.Timestamp('2100-12-31'))]
+
+# these interval are for calculating diff
+intervals = [(pd.Timestamp('1950-01-01'), pd.Timestamp('1979-12-31')),
+            (pd.Timestamp('1955-01-01'), pd.Timestamp('1984-12-31')),
+            (pd.Timestamp('1960-01-01'), pd.Timestamp('1989-12-31')),
+            (pd.Timestamp('1965-01-01'), pd.Timestamp('1994-12-31')),
+            (pd.Timestamp('1970-01-01'), pd.Timestamp('1999-12-31')),
+            (pd.Timestamp('1975-01-01'), pd.Timestamp('2004-12-31')),
+            (pd.Timestamp('1980-01-01'), pd.Timestamp('2009-12-31')),
+            (pd.Timestamp('1985-01-01'), pd.Timestamp('2014-12-31'))]
 
 # Define months
-months = {1: 'Jan', 2: 'Feb', 3: 'Mar', 4: 'Apr', 5: 'May', 6: 'Jun', 7: 'Jul', 8: 'Aug', 9: 'Sep', 10: 'Oct', 11: 'Nov', 12: 'Dec'}
+months = {1: 'Jan', 2: 'Feb', 3: 'Mar', 4: 'Apr', 5: 'May', 6: 'Jun',
+          7: 'Jul', 8: 'Aug', 9: 'Sep', 10: 'Oct', 11: 'Nov', 12: 'Dec'}
 
 input_dir = pathlib.Path(r"D:\Data\Bangladesh_CMIP6_sublevels\ACCESS-CM2\historical\r1i1p1f1")
 output_dir = input_dir / "output"
 output_dir.mkdir(parents=True, exist_ok=True)
-accumulated = 'avg' #'avg', 'sum'
+accumulated = 'sum' #'avg', 'sum'
 f_name_dfs = {}
 
 for file in input_dir.glob("**\*.nc"):
@@ -54,7 +65,13 @@ for file in input_dir.glob("**\*.nc"):
 
                     if accumulated == 'sum':
                         if file.parent.name == "pr":
-                            monthly_cal = monthly_df.groupby(['station']).sum()[df_col]
+
+                            # for the everything else diff interval, th pr is summed
+                            # monthly_cal = monthly_df.groupby(['station']).sum()[df_col]
+
+                            # for diff interval, the pr files are yearly averaged
+                            monthly_cal = monthly_df.groupby(['station']).sum()[df_col]/30
+
                         else:
                             monthly_cal = monthly_df.groupby(['station']).mean()[df_col]
                     elif accumulated == 'avg':
