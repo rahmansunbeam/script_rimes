@@ -51,8 +51,13 @@ def process_historical_projected_diff_json(files_historical, files_projected, js
 
 def process_historical_with_interval_projected_diff_json(files_historical, files_projected, json_output):
 
+<<<<<<< HEAD
     intervals = [(pd.Timestamp('1950-01-01'), pd.Timestamp('1979-12-31')),
                 (pd.Timestamp('1955-01-01'), pd.Timestamp('1984-12-31'))]
+=======
+    intervals = [(pd.Timestamp('1950-01-01'), pd.Timestamp('1979-12-31'))]
+                # (pd.Timestamp('1955-01-01'), pd.Timestamp('1984-12-31')),
+>>>>>>> 572e857928924378f9d9090d6cf79ac56eb8697c
                 # (pd.Timestamp('1960-01-01'), pd.Timestamp('1989-12-31')),
                 # (pd.Timestamp('1965-01-01'), pd.Timestamp('1994-12-31')),
                 # (pd.Timestamp('1970-01-01'), pd.Timestamp('1999-12-31')),
@@ -68,7 +73,11 @@ def process_historical_with_interval_projected_diff_json(files_historical, files
         result_dict = {}
 
         for interval in intervals:
+<<<<<<< HEAD
             interval_start, interval_end = interval
+=======
+            interval_start, interval_end = interval            
+>>>>>>> 572e857928924378f9d9090d6cf79ac56eb8697c
 
             with file_historical.open() as f:
                 json_hist = json.load(f)
