@@ -12,13 +12,12 @@ import xarray as xr
 import pathlib
 
 # Define time intervals
-intervals = [(pd.Timestamp('2021-01-01'), pd.Timestamp('2050-12-31')),
-             (pd.Timestamp('2031-01-01'), pd.Timestamp('2060-12-31')),
-             (pd.Timestamp('2041-01-01'), pd.Timestamp('2070-12-31')),
-             (pd.Timestamp('2051-01-01'), pd.Timestamp('2080-12-31')),
-             (pd.Timestamp('2061-01-01'), pd.Timestamp('2090-12-31')),
-             (pd.Timestamp('2071-01-01'), pd.Timestamp('2100-12-31'))]
+interval_start_yr = 2021
+interval_end_yr = 2100
+interval_range_diff = 10
+interval_delta = 29
 
+intervals = [(pd.Timestamp(str(i) + '-01-01'), pd.Timestamp(str(i+interval_delta) + '-12-31')) for i in range(interval_start_yr, interval_end_yr, interval_range_diff) if i+interval_delta <= interval_end_yr]
 
 input_dir = pathlib.Path(r"D:\Data\Bangladesh_CMIP6_sublevels\ACCESS-CM2\historical\r1i1p1f1")
 output_dir = input_dir / "output"

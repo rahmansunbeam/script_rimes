@@ -14,7 +14,7 @@ from datetime import datetime
 
 def process_data(input_dir, output_dir, average_typ, accumulated):
 
-    month_dict = {1: 'Jan', 2: 'Feb', 3: 'Mar', 4: 'Apr', 5: 'May', 6: 'Jun', 7: 'Jul', 8: 'Aug', 9: 'Sep', 10: 'Oct', 11: 'Nov', 12: 'Dec'}
+    month_dict = {i: pd.Timestamp(str(i) + '-01-01').strftime('%b') for i in range(1, 13)}
     seasons = {'DJF': [12, 1, 2], 'MAM': [3, 4, 5], 'JJA': [6, 7, 8], 'SON': [9, 10, 11]}
 
     input_dir = pathlib.Path(input_dir)
@@ -63,11 +63,20 @@ def process_data(input_dir, output_dir, average_typ, accumulated):
 
                     if accumulated == 'sum':
                         if file.parent.name == "pr":
+
+                            # pr is summed for the whole time period
                             # df_1 = df.groupby([df['time'].dt.year.astype(str) + "_" + df['time'].dt.month.map(month_dict), 'station'])[df_col].sum()
+
+                            # pr is divided by 64 to get the yearly cumulative average
                             df_1 = df.groupby([df['time'].dt.month.map(month_dict), 'station'])[df_col].sum()/64
+
                         else:
+                            # tmax, tmean and other params mean values-per time range per station 
                             # df_1 = df.groupby([df['time'].dt.year.astype(str) + "_" + df['time'].dt.month.map(month_dict), 'station'])[df_col].mean()
+
+                            # param mean values-per station only
                             df_1 = df.groupby([df['time'].dt.month.map(month_dict), 'station'])[df_col].mean()
+                            
                     elif accumulated == 'avg':
                         df_1 = df.groupby([df['time'].dt.year.astype(str) + "_" + df['time'].dt.month.map(month_dict), 'station'])[df_col].mean()
                     else:
@@ -80,8 +89,13 @@ def process_data(input_dir, output_dir, average_typ, accumulated):
 
                     for col in df_2.columns:
                         if col not in ['station', 'time']:
+
+                            # when the column name is month_2016_Jan
                             # form_col = pd.to_datetime(col).strftime('%Y_%b')
+
+                            # the column name is like month_Jan
                             form_col = pd.to_datetime(col).strftime('%b')
+
                             df_2.rename(columns={col:'month_'+ form_col},inplace=True)
 
                 elif average_typ == 'seasonal':

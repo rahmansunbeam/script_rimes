@@ -11,27 +11,22 @@ import pandas as pd
 import xarray as xr
 import pathlib
 
-# # Define time intervals, these are for calculating tri-decadal stat
-# intervals = [(pd.Timestamp('2021-01-01'), pd.Timestamp('2050-12-31')),
-#              (pd.Timestamp('2031-01-01'), pd.Timestamp('2060-12-31')),
-#              (pd.Timestamp('2041-01-01'), pd.Timestamp('2070-12-31')),
-#              (pd.Timestamp('2051-01-01'), pd.Timestamp('2080-12-31')),
-#              (pd.Timestamp('2061-01-01'), pd.Timestamp('2090-12-31')),
-#              (pd.Timestamp('2071-01-01'), pd.Timestamp('2100-12-31'))]
+# # these interval ranges are for calculating projected data only
+# interval_start_yr = 2021
+# interval_end_yr = 2100
+# interval_range_diff = 10
+# interval_delta = 29
 
-# these interval are for calculating diff
-intervals = [(pd.Timestamp('1950-01-01'), pd.Timestamp('1979-12-31')),
-            (pd.Timestamp('1955-01-01'), pd.Timestamp('1984-12-31')),
-            (pd.Timestamp('1960-01-01'), pd.Timestamp('1989-12-31')),
-            (pd.Timestamp('1965-01-01'), pd.Timestamp('1994-12-31')),
-            (pd.Timestamp('1970-01-01'), pd.Timestamp('1999-12-31')),
-            (pd.Timestamp('1975-01-01'), pd.Timestamp('2004-12-31')),
-            (pd.Timestamp('1980-01-01'), pd.Timestamp('2009-12-31')),
-            (pd.Timestamp('1985-01-01'), pd.Timestamp('2014-12-31'))]
+# # these interval are for calculating diff with historical data (1950-2014) with projected data (2015-2100)
+interval_start_yr = 1950
+interval_end_yr = 2014
+interval_range_diff = 5
+interval_delta = 29
 
-# Define months
-months = {1: 'Jan', 2: 'Feb', 3: 'Mar', 4: 'Apr', 5: 'May', 6: 'Jun',
-          7: 'Jul', 8: 'Aug', 9: 'Sep', 10: 'Oct', 11: 'Nov', 12: 'Dec'}
+intervals = [(pd.Timestamp(str(i) + '-01-01'), pd.Timestamp(str(i+interval_delta) + '-12-31')) for i in range(interval_start_yr, interval_end_yr, interval_range_diff) if i+interval_delta <= interval_end_yr]
+
+# # Define months
+months = {i: pd.Timestamp(str(i) + '-01-01').strftime('%b') for i in range(1, 13)}
 
 input_dir = pathlib.Path(r"D:\Data\Bangladesh_CMIP6_sublevels\ACCESS-CM2\historical\r1i1p1f1")
 output_dir = input_dir / "output"
